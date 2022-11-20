@@ -8,10 +8,12 @@ import (
 
 	"github.com/dimchansky/dcs-hmd/ka50rotorpitch"
 	"github.com/dimchansky/dcs-hmd/ka50rotorrpm"
+
+	_ "github.com/silbinarywolf/preferdiscretegpu"
 )
 
 const (
-	ScreenWidth  = 600
+	ScreenWidth  = 800
 	ScreenHeight = 600
 
 	fontBaseSize = 18
