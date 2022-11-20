@@ -3,11 +3,13 @@ package dcshmd
 import (
 	"image"
 	"image/color"
+	"sync"
 
 	"github.com/hajimehoshi/ebiten/v2"
 
 	"github.com/dimchansky/dcs-hmd/ka50rotorpitch"
 	"github.com/dimchansky/dcs-hmd/ka50rotorrpm"
+	"github.com/dimchansky/dcs-hmd/utils"
 
 	_ "github.com/silbinarywolf/preferdiscretegpu"
 )
@@ -88,6 +90,8 @@ func NewHUD() (*HUD, error) {
 }
 
 type HUD struct {
+	once sync.Once
+
 	fontFace            *FontFace
 	rotorPitchIndicator *ka50rotorpitch.Indicator
 	rotorRPMIndicator   *ka50rotorrpm.Indicator
@@ -106,6 +110,8 @@ var (
 )
 
 func (h *HUD) Update() error {
+	h.once.Do(enableCurrentProcessWindowClickThroughAsync)
+
 	rotorPitch := h.rotorPitchIndicator.GetRotorPitch()
 	if rotorPitch >= 15 {
 		dPitch = -0.1
@@ -126,23 +132,6 @@ func (h *HUD) Update() error {
 	h.rotorRPMImg.Update(h.rotorRPMIndicator.GetImage())
 
 	return nil
-}
-
-type redrawnImage struct {
-	img        *ebiten.Image
-	NeedToDraw bool
-}
-
-func (i *redrawnImage) Update(img *ebiten.Image, isRedrawn bool) {
-	i.NeedToDraw = i.img == nil || isRedrawn
-	i.img = img
-}
-
-func (i *redrawnImage) DrawOn(screen *ebiten.Image, op *ebiten.DrawImageOptions) {
-	if i.NeedToDraw {
-		screen.DrawImage(i.img, op)
-		i.NeedToDraw = false
-	}
 }
 
 func (i *redrawnImage) Size() image.Point {
@@ -175,4 +164,25 @@ func (h *HUD) Draw(screen *ebiten.Image) {
 
 func (h *HUD) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeight int) {
 	return ScreenWidth, ScreenHeight
+}
+
+func enableCurrentProcessWindowClickThroughAsync() {
+	go utils.EnableCurrentProcessWindowClickThrough()
+}
+
+type redrawnImage struct {
+	img        *ebiten.Image
+	NeedToDraw bool
+}
+
+func (i *redrawnImage) Update(img *ebiten.Image, isRedrawn bool) {
+	i.NeedToDraw = i.img == nil || isRedrawn
+	i.img = img
+}
+
+func (i *redrawnImage) DrawOn(screen *ebiten.Image, op *ebiten.DrawImageOptions) {
+	if i.NeedToDraw {
+		screen.DrawImage(i.img, op)
+		i.NeedToDraw = false
+	}
 }
