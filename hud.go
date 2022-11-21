@@ -46,7 +46,7 @@ func NewHUD() (*HUD, error) {
 	const (
 		indicatorHeight = 400
 		xSpan           = rowWidth / 2
-		ySpan           = rowHeight / 2
+		ySpan           = rowHeight
 	)
 	rotorPitchIndicator := ka50rotorpitch.NewIndicator(&ka50rotorpitch.IndicatorConfig{
 		Width:           rowWidth * 3,
@@ -148,7 +148,7 @@ func (h *HUD) Draw(screen *ebiten.Image) {
 	}
 
 	op := &ebiten.DrawImageOptions{CompositeMode: ebiten.CompositeModeCopy}
-	op.GeoM.Translate(0, 2*rowHeight)
+	op.GeoM.Translate(0, rowHeight)
 	rotorPitchImg.DrawOn(screen, op)
 
 	op.GeoM.Translate(float64(rotorPitchImg.Size().X), 0)
