@@ -6,6 +6,7 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 
 	dcshmd "github.com/dimchansky/dcs-hmd"
+	"github.com/dimchansky/dcs-hmd/ka50outputparser"
 	"github.com/dimchansky/dcs-hmd/updlistener"
 )
 
@@ -24,7 +25,7 @@ func run() error {
 		_ = hud.Close()
 	}()
 
-	l, err := updlistener.New(19089)
+	l, err := updlistener.New(19089, ka50outputparser.New(hud))
 	if err != nil {
 		return err
 	}

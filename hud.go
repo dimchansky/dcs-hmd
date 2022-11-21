@@ -31,8 +31,6 @@ var (
 )
 
 func NewHUD() (*HUD, error) {
-	ebiten.SetTPS(20)
-
 	ebiten.SetScreenClearedEveryFrame(false)
 	ebiten.SetScreenFilterEnabled(false)
 
@@ -104,29 +102,8 @@ func (h *HUD) Close() error {
 	return h.fontFace.Close()
 }
 
-var (
-	dPitch = 0.05
-	dRPM   = 0.1
-)
-
 func (h *HUD) Update() error {
 	h.once.Do(enableCurrentProcessWindowClickThroughAsync)
-
-	rotorPitch := h.rotorPitchIndicator.GetRotorPitch()
-	if rotorPitch >= 15 {
-		dPitch = -0.1
-	} else if rotorPitch <= 1 {
-		dPitch = 0.1
-	}
-	h.rotorPitchIndicator.SetRotorPitch(rotorPitch + dPitch)
-
-	rotorRPM := h.rotorRPMIndicator.GetRotorRPM()
-	if rotorRPM >= 100 {
-		dRPM = -0.1
-	} else if rotorRPM <= 80 {
-		dRPM = 0.1
-	}
-	h.rotorRPMIndicator.SetRotorRPM(rotorRPM + dRPM)
 
 	h.rotorPitchImg.Update(h.rotorPitchIndicator.GetImage())
 	h.rotorRPMImg.Update(h.rotorRPMIndicator.GetImage())
@@ -164,6 +141,16 @@ func (h *HUD) Draw(screen *ebiten.Image) {
 
 func (h *HUD) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeight int) {
 	return ScreenWidth, ScreenHeight
+}
+
+// SetRotorPitch is thread-safe to update rotor pitch
+func (h *HUD) SetRotorPitch(val float64) {
+	h.rotorPitchIndicator.SetRotorPitch(val)
+}
+
+// SetRotorRPM is thread-safe to update rotor RPM
+func (h *HUD) SetRotorRPM(val float64) {
+	h.rotorRPMIndicator.SetRotorRPM(val)
 }
 
 func enableCurrentProcessWindowClickThroughAsync() {

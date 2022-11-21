@@ -7,14 +7,24 @@ import (
 	"sync"
 )
 
-func New(port int) (*UPDListener, error) {
+type MessageHandler interface {
+	HandleMessage(msg []byte)
+}
+
+type MessageHandlerFunc func(msg []byte)
+
+func (f MessageHandlerFunc) HandleMessage(msg []byte) {
+	f(msg)
+}
+
+func New(port int, msgHandler MessageHandler) (*UPDListener, error) {
 	pc, err := net.ListenPacket("udp", ":"+strconv.Itoa(port))
 	if err != nil {
 		return nil, fmt.Errorf("failed to listen udp packet: %w", err)
 	}
 
 	closeCh := make(chan struct{})
-	l := &UPDListener{pc: pc, closeCh: closeCh}
+	l := &UPDListener{closeCh: closeCh, pc: pc, msgHandler: msgHandler}
 	go l.listen()
 
 	return l, nil
@@ -25,7 +35,8 @@ type UPDListener struct {
 	closeErr  error
 	closeCh   chan struct{}
 
-	pc net.PacketConn
+	pc         net.PacketConn
+	msgHandler MessageHandler
 }
 
 func (l *UPDListener) Close() error {
@@ -42,6 +53,7 @@ func (l *UPDListener) listen() {
 	defer close(closeCh)
 
 	pc := l.pc
+	msgHandler := l.msgHandler
 	message := make([]byte, 8096)
 	for {
 		n, _, err := pc.ReadFrom(message[:])
@@ -49,6 +61,6 @@ func (l *UPDListener) listen() {
 			return
 		}
 
-		fmt.Println(string(message[:n]))
+		msgHandler.HandleMessage(message[:n])
 	}
 }
