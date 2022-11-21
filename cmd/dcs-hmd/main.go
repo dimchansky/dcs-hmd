@@ -6,6 +6,7 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 
 	dcshmd "github.com/dimchansky/dcs-hmd"
+	"github.com/dimchansky/dcs-hmd/updlistener"
 )
 
 func main() {
@@ -21,6 +22,14 @@ func run() error {
 	}
 	defer func() {
 		_ = hud.Close()
+	}()
+
+	l, err := updlistener.New(19089)
+	if err != nil {
+		return err
+	}
+	defer func() {
+		_ = l.Close()
 	}()
 
 	if err := ebiten.RunGame(hud); err != nil {
