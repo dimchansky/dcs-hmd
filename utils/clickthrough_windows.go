@@ -1,6 +1,6 @@
 package utils
 
-import "github.com/dimchansky/dcs-hmd/utils/internal/win"
+import "github.com/dimchansky/dcs-hmd/internal/win"
 
 func EnableCurrentProcessWindowClickThrough() {
 	win.EnableCurrentProcessWindowClickThrough()
