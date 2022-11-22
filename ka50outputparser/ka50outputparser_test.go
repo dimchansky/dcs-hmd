@@ -24,13 +24,13 @@ func TestOutputParser_HandleMessage(t *testing.T) {
 		message := tt.message
 		expectedRotorPitch := tt.expectedRotorPitch
 		expectedRotorRPM := tt.expectedRotorRPM
+
 		t.Run(message, func(t *testing.T) {
 			testObj := &mocks.ValuesSetter{}
 
 			if expectedRotorPitch != nil {
 				testObj.On("SetRotorPitch", mock.AnythingOfType("float64"))
 			}
-
 			if expectedRotorRPM != nil {
 				testObj.On("SetRotorRPM", mock.AnythingOfType("float64"))
 			}

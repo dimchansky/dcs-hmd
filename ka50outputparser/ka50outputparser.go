@@ -1,7 +1,6 @@
 package ka50outputparser
 
 import (
-	"fmt"
 	"regexp"
 	"strconv"
 )
@@ -23,32 +22,47 @@ var (
 	r = regexp.MustCompile(`((\d+)=('[^']*'|[^:\r\n]*))`)
 )
 
+const (
+	rotorRPMArg   = 52
+	rotorPitchArg = 53
+)
+
 // HandleMessage implements udplistener.MessageHandler interface.
 func (p *OutputParser) HandleMessage(msg []byte) {
 	res := r.FindAllSubmatch(msg, -1)
 	for _, rg := range res {
 		argBs := rg[2]
+
 		arg, err := strconv.Atoi(string(argBs))
 		if err != nil {
-			fmt.Println("failed to parse argument", err)
 			continue
 		}
+
 		valBs := rg[3]
+
 		switch arg {
-		case 52: // rotor RPM
+		case rotorRPMArg: // rotor RPM
 			val, err := strconv.ParseFloat(string(valBs), 64)
 			if err != nil {
-				fmt.Println("failed to parse rotor rpm", err)
 				continue
 			}
-			p.s.SetRotorRPM(val * 110.0)
-		case 53: // rotor pitch
+
+			const maxRotorRPM = 110.0
+
+			p.s.SetRotorRPM(val * maxRotorRPM)
+
+		case rotorPitchArg: // rotor pitch
 			val, err := strconv.ParseFloat(string(valBs), 64)
 			if err != nil {
-				fmt.Println("failed to parse rotor pitch", err)
 				continue
 			}
-			p.s.SetRotorPitch(val*(15.0-1.0) + 1.0)
+
+			const (
+				maxRotorPitch = 15.0
+				minRotorPitch = 1.0
+			)
+
+			p.s.SetRotorPitch(val*(maxRotorPitch-minRotorPitch) + minRotorPitch)
 		}
 	}
 }

@@ -10,6 +10,7 @@ func (i *Interval) Sat(val float64) float64 {
 	if val > max {
 		return max
 	}
+
 	if val < min {
 		return min
 	}
@@ -20,9 +21,11 @@ func (i *Interval) Sat(val float64) float64 {
 func (i *Interval) GetMinMax() (min, max float64) {
 	min = i.Start
 	max = i.End
+
 	if min > max {
 		return max, min
 	}
+
 	return
 }
 

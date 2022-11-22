@@ -25,6 +25,7 @@ func New(port int, msgHandler MessageHandler) (*UPDListener, error) {
 
 	closeCh := make(chan struct{})
 	l := &UPDListener{closeCh: closeCh, pc: pc, msgHandler: msgHandler}
+
 	go l.listen()
 
 	return l, nil
@@ -52,11 +53,13 @@ func (l *UPDListener) listen() {
 	closeCh := l.closeCh
 	defer close(closeCh)
 
+	const bufSize = 8096
+	message := make([]byte, bufSize)
 	pc := l.pc
 	msgHandler := l.msgHandler
-	message := make([]byte, 8096)
+
 	for {
-		n, _, err := pc.ReadFrom(message[:])
+		n, _, err := pc.ReadFrom(message)
 		if err != nil {
 			return
 		}

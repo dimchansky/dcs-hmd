@@ -12,7 +12,7 @@ import (
 	"golang.org/x/image/font/opentype"
 )
 
-func NewFontFace(size int, dpi int) (*FontFace, error) {
+func NewFontFace(size, dpi int) (*FontFace, error) {
 	tt, err := opentype.Parse(fonts.PressStart2P_ttf)
 	if err != nil {
 		return nil, fmt.Errorf("failed to parse PressStart2P.ttf font: %w", err)
@@ -40,13 +40,16 @@ type FontFace struct {
 
 func (h *FontFace) TextWidth(str string) int {
 	maxW := 0
+
 	for _, line := range strings.Split(str, "\n") {
 		b, _ := font.BoundString(h.Face, line)
+
 		w := (b.Max.X - b.Min.X).Ceil()
 		if maxW < w {
 			maxW = w
 		}
 	}
+
 	return maxW
 }
 

@@ -51,7 +51,7 @@ test: ## Run the tests of the project
 ## Lint:
 lint: ## Use golintci-lint on your project
 	@echo '$(M) running golangci-lint…'
-	golangci-lint run -p bugs -p error -p comment
+	golangci-lint run
 
 ## Help:
 help: ## Show this help.

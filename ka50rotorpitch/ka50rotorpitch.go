@@ -31,7 +31,6 @@ func NewIndicator(cfg *IndicatorConfig) *Indicator {
 
 	// draw indicator gauge
 	dc := gg.NewContext(width, height)
-	// dc.DrawLine(0, 0, float64(width-1), 0)
 
 	verticalLineX := float64((maxPoint.X-minPoint.X)/2 + minPoint.X)
 	yTop := float64(minPoint.Y)
@@ -61,6 +60,7 @@ func NewIndicator(cfg *IndicatorConfig) *Indicator {
 		if pitch%2 != 0 {
 			x = verticalLineX - float64(cfg.TickLength)
 		}
+
 		y := rotorPitchToY.TransformForward(float64(pitch))
 		dc.DrawLine(x, y, verticalLineX, y)
 	}
@@ -80,17 +80,20 @@ func NewIndicator(cfg *IndicatorConfig) *Indicator {
 		y := rotorPitchToY.TransformForward(float64(pitch))
 
 		dc.SetColor(cfg.BorderColor)
+
 		const (
 			n  = 3 // "stroke" size
 			ax = 0.3
 			ay = 0.4
 		)
+
 		for dy := -n; dy <= n; dy++ {
 			for dx := -n; dx <= n; dx++ {
 				if dx*dx+dy*dy >= n*n {
 					// give it rounded corners
 					continue
 				}
+
 				dc.DrawStringAnchored(label, x+float64(dx), y+float64(dy), ax, ay)
 			}
 		}
@@ -104,9 +107,11 @@ func NewIndicator(cfg *IndicatorConfig) *Indicator {
 	const (
 		handSpan = 3
 	)
+
 	dc = gg.NewContext(cfg.TickLength+2*handSpan, cfg.TickLength+2*handSpan)
 
 	dc.MoveTo(float64(cfg.TickLength+handSpan), handSpan)
+
 	handPoint := gg.Point{
 		X: handSpan,
 		Y: handSpan + float64(cfg.TickLength)/2.0,
@@ -175,6 +180,7 @@ func (i *Indicator) GetRotorPitch() (rotorPitch float64) {
 	m.RLock()
 	rotorPitch = i.rotorPitchToDraw
 	m.RUnlock()
+
 	return
 }
 
@@ -182,8 +188,10 @@ func (i *Indicator) GetImage() (img *ebiten.Image, isRedrawn bool) {
 	// optimization: redraw the final image only if the value has changed
 	if rotorPitchToDraw := i.GetRotorPitch(); rotorPitchToDraw != i.drawnRotorPitch {
 		i.redrawFinalImage(rotorPitchToDraw)
+
 		isRedrawn = true
 	}
+
 	img = i.finalImg
 
 	return

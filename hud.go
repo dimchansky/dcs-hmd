@@ -11,8 +11,6 @@ import (
 	"github.com/dimchansky/dcs-hmd/ka50rotorpitch"
 	"github.com/dimchansky/dcs-hmd/ka50rotorrpm"
 	"github.com/dimchansky/dcs-hmd/utils"
-
-	_ "github.com/silbinarywolf/preferdiscretegpu"
 )
 
 const (
@@ -47,6 +45,7 @@ func NewHUD() (*HUD, error) {
 		xSpan           = rowWidth / 2
 		ySpan           = rowHeight
 	)
+
 	rotorPitchIndicator := ka50rotorpitch.NewIndicator(&ka50rotorpitch.IndicatorConfig{
 		Width:           rowWidth * 3,
 		Height:          indicatorHeight,
@@ -112,10 +111,6 @@ func (h *HUD) Update() error {
 	return nil
 }
 
-func (i *redrawnImage) Size() image.Point {
-	return i.img.Bounds().Size()
-}
-
 func (h *HUD) Draw(screen *ebiten.Image) {
 	rotorPitchImg := &h.rotorPitchImg
 	rotorRPMImg := &h.rotorRPMImg
@@ -166,4 +161,7 @@ func (i *redrawnImage) DrawOn(screen *ebiten.Image, op *ebiten.DrawImageOptions)
 		screen.DrawImage(i.img, op)
 		i.NeedToDraw = false
 	}
+}
+func (i *redrawnImage) Size() image.Point {
+	return i.img.Bounds().Size()
 }
