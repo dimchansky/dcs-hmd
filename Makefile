@@ -24,6 +24,8 @@ tools: ## Install all the tools needed to build artifacts
 	@echo '$(M) downloading tools…'
 	@echo "$(M2) Installing mockery…"
 	go install github.com/vektra/mockery/v2@v2.15.0
+	@echo "$(M2) Installing golangci-lint..."
+	curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(shell go env GOPATH)/bin v1.50.1
 
 mocks: ## Generate mocks for Golang interfaces
 	@echo '$(M) generating mocks for Golang interfaces…'
@@ -38,6 +40,16 @@ build: ## Build your project and put the output binary in out/bin/
 clean: ## Remove build related file
 	@echo '$(M) removing the artifacts…'
 	rm -rf $(OUT_DIR)
+
+## Test:
+test: ## Run the tests of the project
+	@echo '$(M) running tests…'
+	$(GOTEST) -v -race ./...
+
+## Lint:
+lint: ## Use golintci-lint on your project
+	@echo '$(M) running golangci-lint…'
+	golangci-lint run
 
 ## Help:
 help: ## Show this help.

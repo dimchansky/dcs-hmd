@@ -75,10 +75,6 @@ func TestInterval_Sat(t *testing.T) {
 }
 
 func TestInterval_Length(t *testing.T) {
-	type fields struct {
-		Start float64
-		End   float64
-	}
 	tests := []struct {
 		name     string
 		interval Interval
