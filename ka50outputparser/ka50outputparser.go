@@ -23,9 +23,7 @@ var (
 	r = regexp.MustCompile(`((\d+)=('[^']*'|[^:\r\n]*))`)
 )
 
-// HandleMessage implements udplistener.MessageHandler interface
-// msg example:
-// 637beb27*53=0.9362:52=0.7792\n
+// HandleMessage implements udplistener.MessageHandler interface.
 func (p *OutputParser) HandleMessage(msg []byte) {
 	res := r.FindAllSubmatch(msg, -1)
 	for _, rg := range res {

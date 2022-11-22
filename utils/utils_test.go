@@ -65,10 +65,12 @@ func TestInterval_Sat(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
+		interval := &tt.interval
+		arg := tt.arg
+		want := tt.want
 		t.Run(tt.name, func(t *testing.T) {
-			i := &tt.interval
-			if got := i.Sat(tt.arg); got != tt.want {
-				t.Errorf("Sat() = %v, want %v", got, tt.want)
+			if got := interval.Sat(arg); got != want {
+				t.Errorf("Sat() = %v, want %v", got, want)
 			}
 		})
 	}
@@ -98,10 +100,11 @@ func TestInterval_Length(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
+		interval := &tt.interval
+		want := tt.want
 		t.Run(tt.name, func(t *testing.T) {
-			i := &tt.interval
-			if got := i.Length(); got != tt.want {
-				t.Errorf("Length() = %v, want %v", got, tt.want)
+			if got := interval.Length(); got != want {
+				t.Errorf("Length() = %v, want %v", got, want)
 			}
 		})
 	}
@@ -134,14 +137,16 @@ func TestInterval_GetMinMax(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
+		i := &tt.Interval
+		wantMin := tt.wantMin
+		wantMax := tt.wantMax
 		t.Run(tt.name, func(t *testing.T) {
-			i := &tt.Interval
 			gotMin, gotMax := i.GetMinMax()
-			if gotMin != tt.wantMin {
-				t.Errorf("GetMinMax() gotMin = %v, want %v", gotMin, tt.wantMin)
+			if gotMin != wantMin {
+				t.Errorf("GetMinMax() gotMin = %v, want %v", gotMin, wantMin)
 			}
-			if gotMax != tt.wantMax {
-				t.Errorf("GetMinMax() gotMax = %v, want %v", gotMax, tt.wantMax)
+			if gotMax != wantMax {
+				t.Errorf("GetMinMax() gotMax = %v, want %v", gotMax, wantMax)
 			}
 		})
 	}
@@ -209,13 +214,15 @@ func TestIntervalTransformer_TransformForward(t1 *testing.T) {
 		},
 	}
 	for _, tt := range tests {
+		t := &IntervalTransformer{
+			Interval1: tt.interval1,
+			Interval2: tt.interval2,
+		}
+		arg := tt.arg
+		want := tt.want
 		t1.Run(tt.name, func(t1 *testing.T) {
-			t := &IntervalTransformer{
-				Interval1: tt.interval1,
-				Interval2: tt.interval2,
-			}
-			if got := t.TransformForward(tt.arg); got != tt.want {
-				t1.Errorf("TransformForward() = %v, want %v", got, tt.want)
+			if got := t.TransformForward(arg); got != want {
+				t1.Errorf("TransformForward() = %v, want %v", got, want)
 			}
 		})
 	}
@@ -283,13 +290,15 @@ func TestIntervalTransformer_TransformBackward(t1 *testing.T) {
 		},
 	}
 	for _, tt := range tests {
+		t := &IntervalTransformer{
+			Interval1: tt.interval1,
+			Interval2: tt.interval2,
+		}
+		arg := tt.arg
+		want := tt.want
 		t1.Run(tt.name, func(t1 *testing.T) {
-			t := &IntervalTransformer{
-				Interval1: tt.interval1,
-				Interval2: tt.interval2,
-			}
-			if got := t.TransformBackward(tt.arg); got != tt.want {
-				t1.Errorf("TransformBackward() = %v, want %v", got, tt.want)
+			if got := t.TransformBackward(arg); got != want {
+				t1.Errorf("TransformBackward() = %v, want %v", got, want)
 			}
 		})
 	}

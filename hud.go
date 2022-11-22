@@ -1,6 +1,7 @@
 package dcshmd
 
 import (
+	"fmt"
 	"image"
 	"image/color"
 	"sync"
@@ -99,7 +100,7 @@ type HUD struct {
 }
 
 func (h *HUD) Close() error {
-	return h.fontFace.Close()
+	return fmt.Errorf("failed to close font face: %w", h.fontFace.Close())
 }
 
 func (h *HUD) Update() error {
@@ -130,25 +131,18 @@ func (h *HUD) Draw(screen *ebiten.Image) {
 
 	op.GeoM.Translate(float64(rotorPitchImg.Size().X), 0)
 	rotorRPMImg.DrawOn(screen, op)
-
-	/*	ff := h.fontFace
-
-		ff.DrawTextWithShadow(screen, "315", 0, 0, textColor)
-		ff.DrawTextWithShadowCenter(screen, "108", 0, 0, textColor, ScreenWidth)
-		ff.DrawTextWithShadowRight(screen, "12", 0, 0, textColor, ScreenWidth)
-	*/
 }
 
 func (h *HUD) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeight int) {
 	return ScreenWidth, ScreenHeight
 }
 
-// SetRotorPitch is thread-safe to update rotor pitch
+// SetRotorPitch is thread-safe to update rotor pitch.
 func (h *HUD) SetRotorPitch(val float64) {
 	h.rotorPitchIndicator.SetRotorPitch(val)
 }
 
-// SetRotorRPM is thread-safe to update rotor RPM
+// SetRotorRPM is thread-safe to update rotor RPM.
 func (h *HUD) SetRotorRPM(val float64) {
 	h.rotorRPMIndicator.SetRotorRPM(val)
 }

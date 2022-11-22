@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 
 	"github.com/hajimehoshi/ebiten/v2"
@@ -19,7 +20,7 @@ func main() {
 func run() error {
 	hud, err := dcshmd.NewHUD()
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to create HUD: %w", err)
 	}
 	defer func() {
 		_ = hud.Close()
@@ -27,14 +28,14 @@ func run() error {
 
 	l, err := updlistener.New(19089, ka50outputparser.New(hud))
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to create UDP listener: %w", err)
 	}
 	defer func() {
 		_ = l.Close()
 	}()
 
 	if err := ebiten.RunGame(hud); err != nil {
-		return err
+		return fmt.Errorf("failed to run HUD: %w", err)
 	}
 
 	return nil

@@ -21,24 +21,28 @@ func TestOutputParser_HandleMessage(t *testing.T) {
 	}
 
 	for _, tt := range testCases {
-		t.Run(tt.message, func(t *testing.T) {
+		message := tt.message
+		expectedRotorPitch := tt.expectedRotorPitch
+		expectedRotorRPM := tt.expectedRotorRPM
+		t.Run(message, func(t *testing.T) {
 			testObj := &mocks.ValuesSetter{}
 
-			if tt.expectedRotorPitch != nil {
+			if expectedRotorPitch != nil {
 				testObj.On("SetRotorPitch", mock.AnythingOfType("float64"))
 			}
-			if tt.expectedRotorRPM != nil {
+
+			if expectedRotorRPM != nil {
 				testObj.On("SetRotorRPM", mock.AnythingOfType("float64"))
 			}
 
 			p := ka50outputparser.New(testObj)
-			p.HandleMessage([]byte(tt.message))
+			p.HandleMessage([]byte(message))
 
-			if tt.expectedRotorPitch != nil {
-				testObj.AssertCalled(t, "SetRotorPitch", *tt.expectedRotorPitch)
+			if expectedRotorPitch != nil {
+				testObj.AssertCalled(t, "SetRotorPitch", *expectedRotorPitch)
 			}
-			if tt.expectedRotorRPM != nil {
-				testObj.AssertCalled(t, "SetRotorRPM", *tt.expectedRotorRPM)
+			if expectedRotorRPM != nil {
+				testObj.AssertCalled(t, "SetRotorRPM", *expectedRotorRPM)
 			}
 		})
 	}

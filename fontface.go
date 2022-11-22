@@ -1,6 +1,7 @@
 package dcshmd
 
 import (
+	"fmt"
 	"image/color"
 	"strings"
 
@@ -14,7 +15,7 @@ import (
 func NewFontFace(size int, dpi int) (*FontFace, error) {
 	tt, err := opentype.Parse(fonts.PressStart2P_ttf)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to parse PressStart2P.ttf font: %w", err)
 	}
 
 	ff, err := opentype.NewFace(tt, &opentype.FaceOptions{
@@ -23,7 +24,7 @@ func NewFontFace(size int, dpi int) (*FontFace, error) {
 		Hinting: font.HintingFull,
 	})
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to create new font face: %w", err)
 	}
 
 	return &FontFace{
