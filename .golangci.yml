@@ -39,7 +39,6 @@ linters:
     - bodyclose
     - contextcheck
     - cyclop
-    - deadcode
     - depguard
     - dogsled
     - dupl
@@ -78,18 +77,14 @@ linters:
     - predeclared
     - reassign
     - revive
-    - rowserrcheck
-    - scopelint
-    - sqlclosecheck
     - staticcheck
-    - structcheck
     - stylecheck
     - thelper
     - tparallel
     - typecheck
     - unconvert
+    - unused
     - unparam
-    - varcheck
     - whitespace
     - wrapcheck
     - wsl
