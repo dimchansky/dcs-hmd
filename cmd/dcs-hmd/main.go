@@ -5,7 +5,6 @@ import (
 	"log"
 
 	"github.com/hajimehoshi/ebiten/v2"
-
 	_ "github.com/silbinarywolf/preferdiscretegpu"
 
 	dcshmd "github.com/dimchansky/dcs-hmd"
