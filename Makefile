@@ -4,6 +4,8 @@ GOVET=$(GO) vet
 OUT_DIR := $(if $(OUT_DIR),$(OUT_DIR),./bin)
 MOCKS_DIR=./internal/mocks
 
+BENCH ?=.
+BENCH_FLAGS ?= -benchmem
 export GO111MODULE := on
 
 GREEN  := $(shell tput -Txterm setaf 2)
@@ -15,7 +17,7 @@ RESET  := $(shell tput -Txterm sgr0)
 M = $(shell printf "\033[32;1m▶▶▶\033[0m")
 M2 = $(shell printf "\033[32;1m▶▶▶▶▶▶\033[0m")
 
-.PHONY: all tools mocks test build vendor
+.PHONY: all tools mocks test bench build vendor
 
 all: help
 
@@ -47,6 +49,10 @@ clean: ## Remove build related file
 test: ## Run the tests of the project
 	@echo '$(M) running tests…'
 	$(GOTEST) -v -race ./...
+
+bench: ## Run the benchmarks of the project
+	@echo '$(M) running benchmarks…'
+	$(GOTEST) -bench=$(BENCH) -run="^$$" $(BENCH_FLAGS) ./...
 
 ## Lint:
 lint: ## Use golintci-lint on your project

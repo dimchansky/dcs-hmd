@@ -48,6 +48,24 @@ func TestOutputParser_HandleMessage(t *testing.T) {
 	}
 }
 
+func BenchmarkOutputParser_HandleMessage(b *testing.B) {
+	vs := emptyValuesSetter{}
+	p := ka50outputparser.New(vs)
+	msg := []byte("637beb27*53=0.9362:52=0.7792\n")
+
+	b.ReportAllocs()
+	b.ResetTimer()
+
+	for n := 0; n < b.N; n++ {
+		p.HandleMessage(msg)
+	}
+}
+
+type emptyValuesSetter struct{}
+
+func (s emptyValuesSetter) SetRotorPitch(val float64) {}
+func (s emptyValuesSetter) SetRotorRPM(val float64)   {}
+
 func pFloat64(v float64) *float64 {
 	return &v
 }
