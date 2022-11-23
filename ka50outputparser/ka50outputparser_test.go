@@ -42,6 +42,10 @@ func TestOutputParser_HandleMessage(t *testing.T) {
 		{":53=0.9362:52=0.7792\n", pFloat64(14.1068), pFloat64(85.712)},
 		{":52=0.7792\n", nil, pFloat64(85.712)},
 		{":53=0.9362\n", pFloat64(14.1068), nil},
+
+		{"53=0.9362:52=0.7792\n", pFloat64(14.1068), pFloat64(85.712)},
+		{"52=0.7792\n", nil, pFloat64(85.712)},
+		{"53=0.9362\n", pFloat64(14.1068), nil},
 	}
 
 	for _, tt := range testCases {
