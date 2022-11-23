@@ -18,12 +18,30 @@ func TestOutputParser_HandleMessage(t *testing.T) {
 		{"637beb27*53=0.9362:52=0.7792\n", pFloat64(14.1068), pFloat64(85.712)},
 		{"637beb27*52=0.7792\n", nil, pFloat64(85.712)},
 		{"637beb27*53=0.9362\n", pFloat64(14.1068), nil},
+
 		{"637beb27*53=0.9362:52=0.7792\r\n", pFloat64(14.1068), pFloat64(85.712)},
 		{"637beb27*52=0.7792\r\n", nil, pFloat64(85.712)},
 		{"637beb27*53=0.9362\r\n", pFloat64(14.1068), nil},
+
 		{"637beb27*53=0.9362:52=0.7792", pFloat64(14.1068), pFloat64(85.712)},
 		{"637beb27*52=0.7792", nil, pFloat64(85.712)},
 		{"637beb27*53=0.9362", pFloat64(14.1068), nil},
+
+		{"637beb27*1000= :53=0.9362:52=0.7792\n", pFloat64(14.1068), pFloat64(85.712)},
+		{"637beb27*1000= :52=0.7792\n", nil, pFloat64(85.712)},
+		{"637beb27*1000= :53=0.9362\n", pFloat64(14.1068), nil},
+
+		{"637beb27*1000=:53=0.9362:52=0.7792\n", pFloat64(14.1068), pFloat64(85.712)},
+		{"637beb27*1000=:52=0.7792\n", nil, pFloat64(85.712)},
+		{"637beb27*1000=:53=0.9362\n", pFloat64(14.1068), nil},
+
+		{"637beb27*1000='53=0.1:52=0.2':53=0.9362:52=0.7792\n", pFloat64(14.1068), pFloat64(85.712)},
+		{"637beb27*1000='53=0.1:52=0.2':52=0.7792\n", nil, pFloat64(85.712)},
+		{"637beb27*1000='53=0.1:52=0.2':53=0.9362\n", pFloat64(14.1068), nil},
+
+		{":53=0.9362:52=0.7792\n", pFloat64(14.1068), pFloat64(85.712)},
+		{":52=0.7792\n", nil, pFloat64(85.712)},
+		{":53=0.9362\n", pFloat64(14.1068), nil},
 	}
 
 	for _, tt := range testCases {
@@ -57,7 +75,7 @@ func TestOutputParser_HandleMessage(t *testing.T) {
 func BenchmarkOutputParser_HandleMessage(b *testing.B) {
 	vs := emptyValuesSetter{}
 	p := ka50outputparser.New(vs)
-	msg := []byte("637beb27*53=0.9362:52=0.7792\n")
+	msg := []byte("637beb27*53=0.9362:52=0.7792:1000=1.2345:1001=1.2345:1002=1.2345:1003=1.2345\n")
 
 	b.ReportAllocs()
 	b.ResetTimer()
