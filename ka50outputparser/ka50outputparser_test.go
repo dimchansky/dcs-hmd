@@ -39,6 +39,10 @@ func TestOutputParser_HandleMessage(t *testing.T) {
 		{"637beb27*1000='53=0.1:52=0.2':52=0.7792\n", nil, pFloat64(85.712)},
 		{"637beb27*1000='53=0.1:52=0.2':53=0.9362\n", pFloat64(14.1068), nil},
 
+		{"637beb27*53=0.9362:52=0.7792:1000='53=0.1:52=0.2'\n", pFloat64(14.1068), pFloat64(85.712)},
+		{"637beb27*52=0.7792:1000='53=0.1:52=0.2'\n", nil, pFloat64(85.712)},
+		{"637beb27*53=0.9362:1000='53=0.1:52=0.2'\n", pFloat64(14.1068), nil},
+
 		{":53=0.9362:52=0.7792\n", pFloat64(14.1068), pFloat64(85.712)},
 		{":52=0.7792\n", nil, pFloat64(85.712)},
 		{":53=0.9362\n", pFloat64(14.1068), nil},
@@ -67,9 +71,11 @@ func TestOutputParser_HandleMessage(t *testing.T) {
 			p.HandleMessage([]byte(message))
 
 			if expectedRotorPitch != nil {
+				testObj.AssertNumberOfCalls(t, "SetRotorPitch", 1)
 				testObj.AssertCalled(t, "SetRotorPitch", *expectedRotorPitch)
 			}
 			if expectedRotorRPM != nil {
+				testObj.AssertNumberOfCalls(t, "SetRotorRPM", 1)
 				testObj.AssertCalled(t, "SetRotorRPM", *expectedRotorRPM)
 			}
 		})
