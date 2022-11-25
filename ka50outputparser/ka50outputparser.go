@@ -148,19 +148,24 @@ func parseVal(msg []byte) parserResult[[]byte] {
 	}
 
 	// Take until ':' or '\r' or '\n' (or all the rest if not found) as Val
-	if pos := bytes.IndexByte(rest, ':'); pos >= 0 {
-		val = rest[:pos]
-		rest = rest[pos+1:]
-	} else {
-		if pos = bytes.IndexByte(rest, '\r'); pos >= 0 {
+	for pos, char := range rest {
+		if char == ':' {
 			val = rest[:pos]
-		} else if pos = bytes.IndexByte(rest, '\n'); pos >= 0 {
-			val = rest[:pos]
-		} else {
-			val = rest
+			rest = rest[pos+1:]
+
+			return parseOk(rest, val)
 		}
-		rest = rest[len(rest):]
+
+		if char == '\n' || char == '\r' {
+			val = rest[:pos]
+			rest = rest[len(rest):]
+
+			return parseOk(rest, val)
+		}
 	}
+
+	val = rest
+	rest = rest[len(rest):]
 
 	return parseOk(rest, val)
 }
