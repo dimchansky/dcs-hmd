@@ -1,6 +1,7 @@
 package updlistener
 
 import (
+	"bufio"
 	"fmt"
 	"net"
 	"strconv"
@@ -18,13 +19,20 @@ func (f MessageHandlerFunc) HandleMessage(msg []byte) {
 }
 
 func New(port int, msgHandler MessageHandler) (*UPDListener, error) {
-	pc, err := net.ListenPacket("udp", ":"+strconv.Itoa(port))
+	address := ":" + strconv.Itoa(port)
+
+	udpAddr, err := net.ResolveUDPAddr("udp", address)
+	if err != nil {
+		return nil, fmt.Errorf("failed to resolve udp address '%s': %w", address, err)
+	}
+
+	conn, err := net.ListenUDP("udp", udpAddr)
 	if err != nil {
 		return nil, fmt.Errorf("failed to listen udp packet: %w", err)
 	}
 
 	closeCh := make(chan struct{})
-	l := &UPDListener{closeCh: closeCh, pc: pc, msgHandler: msgHandler}
+	l := &UPDListener{closeCh: closeCh, conn: conn, msgHandler: msgHandler}
 
 	go l.listen()
 
@@ -36,13 +44,13 @@ type UPDListener struct {
 	closeErr  error
 	closeCh   chan struct{}
 
-	pc         net.PacketConn
+	conn       *net.UDPConn
 	msgHandler MessageHandler
 }
 
 func (l *UPDListener) Close() error {
 	l.closeOnce.Do(func() {
-		l.closeErr = l.pc.Close()
+		l.closeErr = l.conn.Close()
 		<-l.closeCh // wait until listener is stopped
 	})
 
@@ -54,16 +62,33 @@ func (l *UPDListener) listen() {
 	defer close(closeCh)
 
 	const bufSize = 8096
-	message := make([]byte, bufSize)
-	pc := l.pc
+
+	reader := bufio.NewReaderSize(l.conn, bufSize)
 	msgHandler := l.msgHandler
 
+	readLines(reader, msgHandler)
+}
+
+func readLines(reader *bufio.Reader, msgHandler MessageHandler) {
+	nextIsContinuation := false
+
+	var (
+		message []byte
+		err     error
+	)
+
 	for {
-		n, _, err := pc.ReadFrom(message)
+		isContinuation := nextIsContinuation
+
+		message, nextIsContinuation, err = reader.ReadLine()
 		if err != nil {
 			return
 		}
 
-		msgHandler.HandleMessage(message[:n])
+		if isContinuation || nextIsContinuation { // skip lines that do not fit in the buffer
+			continue
+		}
+
+		msgHandler.HandleMessage(message)
 	}
 }
