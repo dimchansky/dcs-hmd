@@ -2,6 +2,7 @@ package updlistener
 
 import (
 	"bufio"
+	"io"
 	"strings"
 	"testing"
 	"testing/iotest"
@@ -46,12 +47,36 @@ func Test_readLines(t *testing.T) {
 	}
 }
 
-type messageCollector []string
+func Benchmark_readLines(b *testing.B) {
+	rowsReader := simpleRowsReader(b.N)
+	reader := bufio.NewReaderSize(&rowsReader, 16)
+	msgHandler := devNullMessageHandler{}
 
-func (m *messageCollector) HandleMessage(msg []byte) {
-	*m = append(*m, string(msg))
+	b.ReportAllocs()
+	b.ResetTimer()
+
+	readLines(reader, msgHandler)
 }
 
-func (m *messageCollector) AsSlice() []string {
-	return *m
+type messageCollector []string
+
+func (m *messageCollector) HandleMessage(msg []byte) { *m = append(*m, string(msg)) }
+func (m *messageCollector) AsSlice() []string        { return *m }
+
+type devNullMessageHandler struct{}
+
+func (d devNullMessageHandler) HandleMessage(_msg []byte) {}
+
+type simpleRowsReader int
+
+func (r *simpleRowsReader) Read(b []byte) (int, error) {
+	if *r < 0 {
+		return 0, io.EOF
+	}
+
+	*r -= 1
+	b[0] = '1'
+	b[1] = '\n'
+
+	return 2, nil
 }
