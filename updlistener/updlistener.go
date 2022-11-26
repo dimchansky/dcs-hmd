@@ -61,7 +61,7 @@ func (l *UPDListener) listen() {
 	closeCh := l.closeCh
 	defer close(closeCh)
 
-	const bufSize = 8096
+	const bufSize = 64 * 1024
 
 	reader := bufio.NewReaderSize(l.conn, bufSize)
 	msgHandler := l.msgHandler
