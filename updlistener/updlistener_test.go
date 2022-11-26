@@ -65,7 +65,7 @@ func (m *messageCollector) AsSlice() []string        { return *m }
 
 type devNullMessageHandler struct{}
 
-func (d devNullMessageHandler) HandleMessage(_msg []byte) {}
+func (d devNullMessageHandler) HandleMessage([]byte) {}
 
 type simpleRowsReader int
 

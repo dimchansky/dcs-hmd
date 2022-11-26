@@ -156,7 +156,11 @@ func parseVal(msg []byte) parserResult[[]byte] {
 			return parseOk(rest, val)
 		}
 
-		if char == '\n' || char == '\r' {
+		if char == '\n' {
+			if pos > 0 && rest[pos-1] == '\r' {
+				pos--
+			}
+
 			val = rest[:pos]
 			rest = rest[len(rest):]
 
