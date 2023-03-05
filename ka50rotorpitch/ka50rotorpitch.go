@@ -45,11 +45,11 @@ func NewIndicator(cfg *IndicatorConfig) *Indicator {
 	)
 
 	rotorPitchToY := &utils.IntervalTransformer{
-		Interval1: utils.Interval{
+		IntervalFrom: utils.Interval{
 			Start: minPitch,
 			End:   maxPitch,
 		},
-		Interval2: utils.Interval{
+		IntervalTo: utils.Interval{
 			Start: yBottom,
 			End:   yTop,
 		},
@@ -139,7 +139,7 @@ func NewIndicator(cfg *IndicatorConfig) *Indicator {
 		rotorPitchToY: rotorPitchToY,
 	}
 
-	currentRotorPitch := rotorPitchToY.Interval1.Start
+	currentRotorPitch := rotorPitchToY.IntervalFrom.Start
 	i.SetRotorPitch(currentRotorPitch)
 	i.redrawFinalImage(currentRotorPitch)
 
@@ -167,7 +167,7 @@ type Indicator struct {
 }
 
 func (i *Indicator) SetRotorPitch(rotorPitch float64) {
-	rotorPitch = i.rotorPitchToY.Interval1.Sat(rotorPitch)
+	rotorPitch = i.rotorPitchToY.IntervalFrom.Sat(rotorPitch)
 
 	m := &i.rwMutex
 	m.Lock()

@@ -48,11 +48,11 @@ func NewIndicator(cfg *IndicatorConfig) *Indicator {
 	)
 
 	rotorRPMToY := &utils.IntervalTransformer{
-		Interval1: utils.Interval{
+		IntervalFrom: utils.Interval{
 			Start: minRPM,
 			End:   maxRPM,
 		},
-		Interval2: utils.Interval{
+		IntervalTo: utils.Interval{
 			Start: yBottom,
 			End:   yTop,
 		},
@@ -155,7 +155,7 @@ func NewIndicator(cfg *IndicatorConfig) *Indicator {
 		rotorRPMToY:   rotorRPMToY,
 	}
 
-	currentRotorRPM := rotorRPMToY.Interval1.Start
+	currentRotorRPM := rotorRPMToY.IntervalFrom.Start
 	i.SetRotorRPM(currentRotorRPM)
 	i.redrawFinalImage(currentRotorRPM)
 
@@ -183,7 +183,7 @@ type Indicator struct {
 }
 
 func (i *Indicator) SetRotorRPM(rotorRPM float64) {
-	rotorRPM = i.rotorRPMToY.Interval1.Sat(rotorRPM)
+	rotorRPM = i.rotorRPMToY.IntervalFrom.Sat(rotorRPM)
 
 	m := &i.rwMutex
 	m.Lock()

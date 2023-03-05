@@ -215,8 +215,8 @@ func TestIntervalTransformer_TransformForward(t1 *testing.T) {
 	}
 	for _, tt := range tests {
 		t := &IntervalTransformer{
-			Interval1: tt.interval1,
-			Interval2: tt.interval2,
+			IntervalFrom: tt.interval1,
+			IntervalTo:   tt.interval2,
 		}
 		arg := tt.arg
 		want := tt.want
@@ -291,8 +291,8 @@ func TestIntervalTransformer_TransformBackward(t1 *testing.T) {
 	}
 	for _, tt := range tests {
 		t := &IntervalTransformer{
-			Interval1: tt.interval1,
-			Interval2: tt.interval2,
+			IntervalFrom: tt.interval1,
+			IntervalTo:   tt.interval2,
 		}
 		arg := tt.arg
 		want := tt.want
