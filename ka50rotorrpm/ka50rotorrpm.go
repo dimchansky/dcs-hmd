@@ -31,9 +31,9 @@ func NewIndicator(cfg *IndicatorConfig) *Indicator {
 
 	dc := gg.NewContext(width, height)
 
-	x2 := float64((maxPoint.X-minPoint.X)/2 + minPoint.X)
+	x2 := float64(((maxPoint.X-1)-minPoint.X)/2 + minPoint.X)
 	yTop := float64(minPoint.Y)
-	yBottom := float64(maxPoint.Y)
+	yBottom := float64(maxPoint.Y - 1)
 
 	dc.DrawLine(x2, yTop, x2, yBottom)
 

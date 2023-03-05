@@ -32,9 +32,9 @@ func NewIndicator(cfg *IndicatorConfig) *Indicator {
 	// draw indicator gauge
 	dc := gg.NewContext(width, height)
 
-	verticalLineX := float64((maxPoint.X-minPoint.X)/2 + minPoint.X)
+	verticalLineX := float64(((maxPoint.X-1)-minPoint.X)/2 + minPoint.X)
 	yTop := float64(minPoint.Y)
-	yBottom := float64(maxPoint.Y)
+	yBottom := float64(maxPoint.Y - 1)
 
 	dc.DrawLine(verticalLineX, yTop, verticalLineX, yBottom)
 

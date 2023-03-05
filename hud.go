@@ -56,7 +56,7 @@ func NewHUD() (*HUD, error) {
 		BorderColor:     shadowColor,
 		Rect: image.Rectangle{
 			Min: image.Pt(xSpan, ySpan),
-			Max: image.Pt(rowWidth*2+xSpan-1, indicatorHeight-ySpan-1),
+			Max: image.Pt(rowWidth*2+xSpan, indicatorHeight-ySpan),
 		},
 	})
 	rotorRPMIndicator := ka50rotorrpm.NewIndicator(&ka50rotorrpm.IndicatorConfig{
@@ -69,7 +69,7 @@ func NewHUD() (*HUD, error) {
 		BorderColor:     shadowColor,
 		Rect: image.Rectangle{
 			Min: image.Pt(xSpan, ySpan),
-			Max: image.Pt(rowWidth*2+xSpan-1, indicatorHeight-ySpan-1),
+			Max: image.Pt(rowWidth*2+xSpan, indicatorHeight-ySpan),
 		},
 	})
 
