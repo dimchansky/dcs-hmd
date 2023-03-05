@@ -146,22 +146,32 @@ func enableCurrentProcessWindowClickThroughAsync() {
 	go utils.EnableCurrentProcessWindowClickThrough()
 }
 
+// redrawnImage represents an image that needs to be drawn again.
 type redrawnImage struct {
 	img        *ebiten.Image
 	NeedToDraw bool
 }
 
+// Update updates the image and sets the NeedToDraw flag based on whether the image has been redrawn or not,
+// or whether NeedToDraw was already true. If img is nil, NeedToDraw will always be true.
+// The NeedToDraw flag is used to indicate whether the image needs to be drawn on the screen or not.
+// If the flag is true, the image will be redrawn on the screen in the next frame.
+// This flag is set to false by the DrawOn method after the image is drawn on the screen.
 func (i *redrawnImage) Update(img *ebiten.Image, isRedrawn bool) {
-	i.NeedToDraw = i.img == nil || isRedrawn
+	i.NeedToDraw = i.NeedToDraw || i.img == nil || isRedrawn
 	i.img = img
 }
 
+// DrawOn draws the image on the given screen with the given options if the NeedToDraw flag is true.
+// After drawing, NeedToDraw is set to false.
 func (i *redrawnImage) DrawOn(screen *ebiten.Image, op *ebiten.DrawImageOptions) {
 	if i.NeedToDraw {
 		screen.DrawImage(i.img, op)
 		i.NeedToDraw = false
 	}
 }
+
+// Size returns the size of the image.
 func (i *redrawnImage) Size() image.Point {
 	return i.img.Bounds().Size()
 }
