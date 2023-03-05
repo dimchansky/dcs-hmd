@@ -29,13 +29,17 @@ func NewIndicator(cfg *IndicatorConfig) *Indicator {
 	maxPoint := cfg.Rect.Max
 	minPoint := cfg.Rect.Min
 
+	// draw indicator gauge
 	dc := gg.NewContext(width, height)
 
-	x2 := float64(((maxPoint.X-1)-minPoint.X)/2 + minPoint.X)
+	verticalLineX := utils.Transform(1,
+		&utils.Interval{Start: 0, End: 2},
+		&utils.Interval{Start: float64(minPoint.X), End: float64(maxPoint.X - 1)},
+	)
 	yTop := float64(minPoint.Y)
 	yBottom := float64(maxPoint.Y - 1)
 
-	dc.DrawLine(x2, yTop, x2, yBottom)
+	dc.DrawLine(verticalLineX, yTop, verticalLineX, yBottom)
 
 	// Maximum allowed rotor RPM – 98%
 	// Minimum safe RPM in flight – 83%
@@ -59,27 +63,27 @@ func NewIndicator(cfg *IndicatorConfig) *Indicator {
 	}
 
 	for rpm := minRPM; rpm <= maxRPM; rpm += rpmStep {
-		x1 := x2 - float64(cfg.MinorTickLength/2)
+		x1 := verticalLineX - float64(cfg.MinorTickLength/2)
 		if rpm%10 == 0 {
-			x1 = x2 - float64(cfg.TickLength)
+			x1 = verticalLineX - float64(cfg.TickLength)
 		} else if rpm%5 == 0 {
-			x1 = x2 - float64(cfg.MinorTickLength)
+			x1 = verticalLineX - float64(cfg.MinorTickLength)
 		}
 
 		y := rotorRPMToY.TransformForward(float64(rpm))
-		dc.DrawLine(x1, y, x2, y)
+		dc.DrawLine(x1, y, verticalLineX, y)
 	}
 
-	x3 := x2 + float64(cfg.TickLength)
+	x3 := verticalLineX + float64(cfg.TickLength)
 	rpm83Y := rotorRPMToY.TransformForward(minSafeRPM)
-	dc.MoveTo(x2, rpm83Y)
+	dc.MoveTo(verticalLineX, rpm83Y)
 	dc.LineTo(x3, rpm83Y)
-	dc.LineTo(x3, rpm83Y+float64(cfg.TickLength))
+	dc.LineTo(x3, rpm83Y-float64(cfg.TickLength))
 
 	rpm98Y := rotorRPMToY.TransformForward(maxAllowedRPM)
-	dc.MoveTo(x2, rpm98Y)
+	dc.MoveTo(verticalLineX, rpm98Y)
 	dc.LineTo(x3, rpm98Y)
-	dc.LineTo(x3, rpm98Y-float64(cfg.TickLength))
+	dc.LineTo(x3, rpm98Y+float64(cfg.TickLength))
 
 	dc.SetColor(cfg.BorderColor)
 	dc.SetLineWidth(cfg.LineWidth * 3)
@@ -92,7 +96,7 @@ func NewIndicator(cfg *IndicatorConfig) *Indicator {
 	// draw labels
 	for rpm := minRPM; rpm <= maxRPM; rpm += 10 {
 		label := strconv.Itoa(rpm)
-		x := x2 - float64(cfg.TickLength)
+		x := verticalLineX - float64(cfg.TickLength)
 		y := rotorRPMToY.TransformForward(float64(rpm))
 
 		dc.SetColor(cfg.BorderColor)
@@ -151,7 +155,7 @@ func NewIndicator(cfg *IndicatorConfig) *Indicator {
 		gaugeImg:      gaugeImg,
 		handImg:       handImg,
 		handPoint:     handPoint,
-		verticalLineX: x2,
+		verticalLineX: verticalLineX,
 		rotorRPMToY:   rotorRPMToY,
 	}
 

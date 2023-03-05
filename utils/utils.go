@@ -51,16 +51,16 @@ type IntervalTransformer struct {
 
 // TransformForward maps a value from the "from" interval range to the "to" interval range
 func (t *IntervalTransformer) TransformForward(val float64) float64 {
-	return transform(val, &t.IntervalFrom, &t.IntervalTo)
+	return Transform(val, &t.IntervalFrom, &t.IntervalTo)
 }
 
 // TransformBackward maps a value from the "to" interval range to the "from" interval range
 func (t *IntervalTransformer) TransformBackward(val float64) float64 {
-	return transform(val, &t.IntervalTo, &t.IntervalFrom)
+	return Transform(val, &t.IntervalTo, &t.IntervalFrom)
 }
 
-// transform maps a value from one interval range to another
-func transform(val float64, iFrom, iTo *Interval) float64 {
+// Transform maps a value from one interval range to another
+func Transform(val float64, iFrom, iTo *Interval) float64 {
 	// Calculate the normalized value within the "from" interval range
 	normVal := (val - iFrom.Start) / iFrom.Length()
 
