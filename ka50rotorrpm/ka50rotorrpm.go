@@ -3,6 +3,7 @@ package ka50rotorrpm
 import (
 	"image"
 	"image/color"
+	"math"
 	"strconv"
 	"sync"
 
@@ -23,33 +24,51 @@ type IndicatorConfig struct {
 	Rect            image.Rectangle
 }
 
+// Maximum allowed rotor RPM – 98%
+// Minimum safe RPM in flight – 83%
+const (
+	minRPM            = 0
+	maxRPM            = 110
+	minFixedWindowRPM = 80
+	maxFixedWindowRPM = 100
+	minSafeRPM        = 83
+	maxAllowedRPM     = 98
+	rpmStep           = 1
+)
+
 func NewIndicator(cfg *IndicatorConfig) *Indicator {
 	width := cfg.Width
 	height := cfg.Height
+
+	// coordinates of the upper left corner and the lower right corner of the window in which the indicator is to be displayed
 	maxPoint := cfg.Rect.Max
 	minPoint := cfg.Rect.Min
+	fixedWindowHeight := cfg.Rect.Dy()
+
+	// Only a small part of the indicator gauge will be displayed in the window.
+	// Values from minFixedWindowRPM to maxFixedWindowRPM will be displayed in a window with a fixed indicator gauge,
+	// in the range of these values will move the hand. If the values are out of these limits, the indicator gauge will
+	// move and the hand will freeze in the upper or lower position, depending on where the values have gone.
+
+	// Calculate the necessary height of the inner window, which would fit the entire range of values.
+	// (maxFixedWindowRPM - minFixedWindowRPM) ~ fixedWindowHeight pixels
+	// (maxRPM - minRPM)                       ~        ???        pixels
+	fullRangeGaugeHeight := int(math.Ceil((maxRPM - minRPM) * float64(fixedWindowHeight) / (maxFixedWindowRPM - minFixedWindowRPM)))
+
+	// Calculate by how much the total height of the indicator strip should increase
+	gaugeHeight := height + (fullRangeGaugeHeight - fixedWindowHeight)
 
 	// draw indicator gauge
-	dc := gg.NewContext(width, height)
+	dc := gg.NewContext(width, gaugeHeight)
 
 	verticalLineX := utils.Transform(1,
 		&utils.Interval{Start: 0, End: 2},
 		&utils.Interval{Start: float64(minPoint.X), End: float64(maxPoint.X - 1)},
 	)
+
 	yTop := float64(minPoint.Y)
-	yBottom := float64(maxPoint.Y - 1)
-
+	yBottom := float64(minPoint.Y) + float64(fullRangeGaugeHeight-1)
 	dc.DrawLine(verticalLineX, yTop, verticalLineX, yBottom)
-
-	// Maximum allowed rotor RPM – 98%
-	// Minimum safe RPM in flight – 83%
-	const (
-		minRPM        = 80
-		maxRPM        = 100
-		minSafeRPM    = 83
-		maxAllowedRPM = 98
-		rpmStep       = 1
-	)
 
 	rotorRPMToY := &utils.IntervalTransformer{
 		IntervalFrom: utils.Interval{
@@ -151,12 +170,15 @@ func NewIndicator(cfg *IndicatorConfig) *Indicator {
 	handImg := ebiten.NewImageFromImage(dc.Image())
 
 	i := &Indicator{
-		finalImg:      ebiten.NewImage(width, height),
-		gaugeImg:      gaugeImg,
-		handImg:       handImg,
-		handPoint:     handPoint,
-		verticalLineX: verticalLineX,
-		rotorRPMToY:   rotorRPMToY,
+		finalImg:           ebiten.NewImage(width, height),
+		gaugeImg:           gaugeImg,
+		handImg:            handImg,
+		handPoint:          handPoint,
+		verticalLineX:      verticalLineX,
+		rotorRPMToY:        rotorRPMToY,
+		maxRPMy:            rotorRPMToY.TransformForward(maxRPM),
+		maxFixedWindowRPMy: rotorRPMToY.TransformForward(maxFixedWindowRPM),
+		fixedWindowHeight:  rotorRPMToY.TransformForward(minFixedWindowRPM) - rotorRPMToY.TransformForward(maxFixedWindowRPM),
 	}
 
 	currentRotorRPM := rotorRPMToY.IntervalFrom.Start
@@ -183,7 +205,10 @@ type Indicator struct {
 	drawnRotorRPM float64
 
 	// thread-safe
-	rotorRPMToDraw float64
+	rotorRPMToDraw     float64
+	maxRPMy            float64
+	maxFixedWindowRPMy float64
+	fixedWindowHeight  float64
 }
 
 func (i *Indicator) SetRotorRPM(rotorRPM float64) {
@@ -221,12 +246,24 @@ func (i *Indicator) redrawFinalImage(rotorPitch float64) {
 	finalImg := i.finalImg
 	finalImg.Clear()
 
+	rotorRPMToY := i.rotorRPMToY
+	rotorPitchY := rotorRPMToY.TransformForward(rotorPitch)
+
 	// draw gauge
 	op := &ebiten.DrawImageOptions{}
+	var gaugeXTranslate float64
+	if rotorPitch > maxFixedWindowRPM {
+		gaugeXTranslate = i.maxRPMy - rotorPitchY
+	} else if rotorPitch < minFixedWindowRPM {
+		gaugeXTranslate = i.maxRPMy - rotorPitchY + i.fixedWindowHeight
+	} else {
+		// fixed window case
+		gaugeXTranslate = i.maxRPMy - i.maxFixedWindowRPMy
+	}
+	op.GeoM.Translate(0, gaugeXTranslate)
 	finalImg.DrawImage(i.gaugeImg, op)
 
 	// draw hand
-	rotorPitchY := i.rotorRPMToY.TransformForward(rotorPitch)
 	op.GeoM.Translate(i.verticalLineX, rotorPitchY)
 	op.GeoM.Translate(-i.handPoint.X, -i.handPoint.Y)
 	finalImg.DrawImage(i.handImg, op)
