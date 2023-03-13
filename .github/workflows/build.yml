@@ -1,0 +1,31 @@
+name: CI
+on: [push, pull_request]
+
+jobs:
+  macOS-latest:
+    runs-on: macOS-latest
+
+    steps:
+      - name: Clone
+        uses: actions/checkout@v1
+
+      - name: Build
+        run: |
+          make tools
+          make lint
+          make test
+          make build
+
+  windows-latest:
+    runs-on: windows-latest
+
+    steps:
+      - name: Clone
+        uses: actions/checkout@v1
+
+      - name: Build
+        run: |
+          make tools
+          make lint
+          make test
+          make build
