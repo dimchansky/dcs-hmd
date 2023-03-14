@@ -1,45 +1,113 @@
-name: CI
+name: Build
 on:
+  pull_request:
   push:
     branches:
       - '**'
-  pull_request:
+    tags:
+      - 'v*'
 
 jobs:
-  macOS-latest:
-    runs-on: macOS-latest
 
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v2
+  # Build and test
 
-      - name: Set up Go
-        uses: actions/setup-go@v2
-        with:
-          go-version: 1.20.x
-
-      - name: Build
-        run: |
-          # make tools
-          # make lint
-          make test
-          make build
-
-  windows-latest:
+  build-test-on-windows:
     runs-on: windows-latest
-
     steps:
-      - name: Checkout
-        uses: actions/checkout@v2
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-      - name: Set up Go
-        uses: actions/setup-go@v2
+      - name: Install Go
+        uses: actions/setup-go@v3
         with:
           go-version: 1.20.x
+          check-latest: true
+          cache: true
+          cache-dependency-path: |
+            **/go.sum
+            **/go.mod
+
+      - name: Test
+        run: |
+          make test              
 
       - name: Build
         run: |
-          # make tools
-          # make lint
-          make test
           make build
+
+      - name: Compress artifact
+        run: |
+          New-Item -Force -ItemType Directory "$env:TEMP\artifacts-windows"
+          Copy-Item -Recurse -Force .\bin "$env:TEMP\artifacts-windows"
+          Copy-Item -Recurse -Force .\scripts "$env:TEMP\artifacts-windows"
+          Copy-Item -Force .\README.md "$env:TEMP\artifacts-windows"
+          Compress-Archive -Path "$env:TEMP\artifacts-windows\*" -CompressionLevel Optimal -DestinationPath .\artifacts-windows-amd64.zip
+          Remove-Item "$env:TEMP\artifacts-windows" -Recurse -Force -ErrorAction Ignore
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v2
+        with:
+            name: artifacts-windows
+            path: artifacts-windows-amd64.zip
+            retention-days: 7
+
+  release:
+    if: github.event_name == 'push' && contains(github.ref, 'refs/tags/')
+    needs:
+      - build-test-on-windows
+
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download windows artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: artifacts-windows
+          path: artifacts
+
+      - name: Build changelog
+        id: build_changelog
+        uses: mikepenz/release-changelog-builder-action@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref_name }}
+          release_name: Release ${{ github.ref_name }}
+          draft: true
+          prerelease: false
+          body: |
+            # Release Notes
+            
+            ## Features
+            
+            - Add foo support #issue-ref
+            - Add bar support #issue-ref
+            
+            ## Bug fixes
+            
+            - Fixed foo #issue-ref
+            - Fixed bar #issue-ref #pr-ref
+            
+            ## Breaking Changes
+            
+            - Foo ...
+            - Bar ...
+            
+            ## Changes since `${{ steps.build_changelog.outputs.fromTag }}`
+            
+            ${{ steps.build_changelog.outputs.changelog }}
+
+      - name: Upload Release Asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: artifacts/artifacts-windows-amd64.zip
+          asset_name: dcs-hmd-${{ github.ref_name }}.zip
+          asset_content_type: application/zip
