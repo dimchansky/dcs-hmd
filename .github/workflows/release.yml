@@ -1,0 +1,64 @@
+name: CI
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  windows-latest:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.20.x
+
+      - name: Branch name
+        id: branch_name
+        run: |
+          echo ::set-output name=SOURCE_NAME::${GITHUB_REF#refs/*/}
+          echo ::set-output name=SOURCE_BRANCH::${GITHUB_REF#refs/heads/}
+          echo ::set-output name=SOURCE_TAG::${GITHUB_REF#refs/tags/}
+
+      - name: Build
+        run: |
+          # make tools
+          # make lint
+          make test
+          make build
+
+      - name: Create zip
+        if: success()
+        uses: vimtor/action-zip@v1
+        env:
+          SOURCE_TAG: ${{ steps.branch_name.outputs.SOURCE_TAG }}
+        with:
+          files: scripts/ bin/ README.md
+          dest: dcs-hmd-${SOURCE_TAG}.zip
+
+      - name: Create Release
+        id: create_release
+        if: success()
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ steps.branch_name.outputs.SOURCE_TAG }}
+          release_name: Release ${{ steps.branch_name.outputs.SOURCE_TAG }}
+          draft: true
+
+      - name: Upload Release Asset
+        if: success()
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SOURCE_TAG: ${{ steps.branch_name.outputs.SOURCE_TAG }}
+        with:
+          upload_url: ${{ github.event.release.upload_url }}
+          asset_path: "./dcs-hmd-${SOURCE_TAG}.zip"
+          asset_name: "dcs-hmd-${SOURCE_TAG}.zip"
+          asset_content_type: application/zip
