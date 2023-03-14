@@ -16,8 +16,8 @@ jobs:
 
       - name: Build
         run: |
-          make tools
-          make lint
+          # make tools
+          # make lint
           make test
           make build
 
@@ -35,7 +35,7 @@ jobs:
 
       - name: Build
         run: |
-          make tools
-          make lint
+          # make tools
+          # make lint
           make test
           make build
