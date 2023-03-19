@@ -4,12 +4,12 @@ DCS-HMD is a helmet-mounted display (HMD) designed for [DCS World](https://www.d
 
 - Rotor pitch (from 1 to 15)
 - Rotor RPM (from 0 to 110)
+- Vertical velocity (from -30 to 30)
 
 I plan to add the ability to show the current values of the following parameters at a later date:
 
 - Airspeed
 - (Radio) altitude
-- Vertical velocity
 - Heading
 - Attitude indicator (bank/pitch)
 
