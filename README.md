@@ -15,7 +15,7 @@ I plan to add the ability to show the current values of the following parameters
 
 ## Demo
 
-[![Watch the video](https://markdown-videos.deta.dev/youtube/0MyGQ1wJ3_M)](https://www.youtube.com/watch?v=0MyGQ1wJ3_M)
+[![Watch the video](https://markdown-videos.deta.dev/youtube/zoILcRMmNAw)](https://www.youtube.com/watch?v=zoILcRMmNAw)
 
 ## Installation
 
