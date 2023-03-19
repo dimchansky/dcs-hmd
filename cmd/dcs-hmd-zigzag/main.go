@@ -32,7 +32,7 @@ func run() (err error) {
 		}
 	}()
 
-	rotorRPMWave := triangleWave(11.0)
+	rotorRPMWave := triangleWave(37.0)
 	rotorPitchWave := triangleWave(5.0)
 	start := time.Now()
 	unixTs := start.Unix()
