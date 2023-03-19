@@ -1,4 +1,4 @@
-package ka50outputparser
+package outputparser
 
 import (
 	"bytes"

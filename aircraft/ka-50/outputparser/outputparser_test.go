@@ -1,12 +1,12 @@
-package ka50outputparser_test
+package outputparser_test
 
 import (
 	"testing"
 
 	"github.com/stretchr/testify/mock"
 
+	"github.com/dimchansky/dcs-hmd/aircraft/ka-50/outputparser"
 	mocks "github.com/dimchansky/dcs-hmd/internal/mocks/ka50outputparser"
-	"github.com/dimchansky/dcs-hmd/ka50outputparser"
 )
 
 func TestOutputParser_HandleMessage(t *testing.T) {
@@ -71,7 +71,7 @@ func TestOutputParser_HandleMessage(t *testing.T) {
 				testObj.On("SetRotorRPM", mock.AnythingOfType("float64"))
 			}
 
-			p := ka50outputparser.New(testObj)
+			p := outputparser.New(testObj)
 			p.HandleMessage([]byte(message))
 
 			if expectedRotorPitch != nil {
@@ -88,7 +88,7 @@ func TestOutputParser_HandleMessage(t *testing.T) {
 
 func BenchmarkOutputParser_HandleMessage(b *testing.B) {
 	vs := emptyValuesSetter{}
-	p := ka50outputparser.New(vs)
+	p := outputparser.New(vs)
 	msg := []byte("637beb27*53=0.9362:52=0.7792:1000=1.2345:1001=1.2345:1002=1.2345:1003=1.2345\n")
 
 	b.ReportAllocs()

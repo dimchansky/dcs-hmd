@@ -1,4 +1,4 @@
-package ka50rotorpitch
+package rotorpitch
 
 import (
 	"image"
@@ -23,6 +23,12 @@ type IndicatorConfig struct {
 	Rect            image.Rectangle
 }
 
+const (
+	minPitch  = 1
+	maxPitch  = 15
+	pitchStep = 1
+)
+
 func NewIndicator(cfg *IndicatorConfig) *Indicator {
 	width := cfg.Width
 	height := cfg.Height
@@ -40,12 +46,6 @@ func NewIndicator(cfg *IndicatorConfig) *Indicator {
 	yBottom := float64(maxPoint.Y - 1)
 
 	dc.DrawLine(verticalLineX, yTop, verticalLineX, yBottom)
-
-	const (
-		minPitch  = 1
-		maxPitch  = 15
-		pitchStep = 1
-	)
 
 	rotorPitchToY := &utils.IntervalTransformer{
 		IntervalFrom: utils.Interval{

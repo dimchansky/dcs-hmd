@@ -8,8 +8,8 @@ import (
 
 	"github.com/hajimehoshi/ebiten/v2"
 
-	"github.com/dimchansky/dcs-hmd/ka50rotorpitch"
-	"github.com/dimchansky/dcs-hmd/ka50rotorrpm"
+	"github.com/dimchansky/dcs-hmd/aircraft/ka-50/devices/rotorpitch"
+	"github.com/dimchansky/dcs-hmd/aircraft/ka-50/devices/rotorrpm"
 	"github.com/dimchansky/dcs-hmd/utils"
 )
 
@@ -46,7 +46,7 @@ func NewHUD() (*HUD, error) {
 		ySpan           = rowHeight
 	)
 
-	rotorPitchIndicator := ka50rotorpitch.NewIndicator(&ka50rotorpitch.IndicatorConfig{
+	rotorPitchIndicator := rotorpitch.NewIndicator(&rotorpitch.IndicatorConfig{
 		Width:           rowWidth * 3,
 		Height:          indicatorHeight,
 		TickLength:      rowWidth,
@@ -59,7 +59,7 @@ func NewHUD() (*HUD, error) {
 			Max: image.Pt(rowWidth*2+xSpan, indicatorHeight-ySpan),
 		},
 	})
-	rotorRPMIndicator := ka50rotorrpm.NewIndicator(&ka50rotorrpm.IndicatorConfig{
+	rotorRPMIndicator := rotorrpm.NewIndicator(&rotorrpm.IndicatorConfig{
 		Width:           rowWidth * 3,
 		Height:          indicatorHeight,
 		TickLength:      rowWidth,
@@ -91,8 +91,8 @@ type HUD struct {
 	once sync.Once
 
 	fontFace            *FontFace
-	rotorPitchIndicator *ka50rotorpitch.Indicator
-	rotorRPMIndicator   *ka50rotorrpm.Indicator
+	rotorPitchIndicator *rotorpitch.Indicator
+	rotorRPMIndicator   *rotorrpm.Indicator
 
 	rotorPitchImg redrawnImage
 	rotorRPMImg   redrawnImage

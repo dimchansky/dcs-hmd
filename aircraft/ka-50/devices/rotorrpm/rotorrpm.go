@@ -1,4 +1,4 @@
-package ka50rotorrpm
+package rotorrpm
 
 import (
 	"image"

@@ -8,7 +8,7 @@ import (
 	_ "github.com/silbinarywolf/preferdiscretegpu"
 
 	dcshmd "github.com/dimchansky/dcs-hmd"
-	"github.com/dimchansky/dcs-hmd/ka50outputparser"
+	"github.com/dimchansky/dcs-hmd/aircraft/ka-50/outputparser"
 	"github.com/dimchansky/dcs-hmd/updlistener"
 )
 
@@ -30,7 +30,7 @@ func run() error {
 		_ = hud.Close()
 	}()
 
-	l, err := updlistener.New(udpPortToListen, ka50outputparser.New(hud))
+	l, err := updlistener.New(udpPortToListen, outputparser.New(hud))
 	if err != nil {
 		return fmt.Errorf("failed to create UDP listener: %w", err)
 	}
