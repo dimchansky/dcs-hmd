@@ -25,7 +25,7 @@ all: help
 tools: ## Install all the tools needed to build artifacts
 	@echo '$(M) downloading tools…'
 	@echo "$(M2) Installing mockery…"
-	go install github.com/vektra/mockery/v2@v2.15.0
+	go install github.com/vektra/mockery/v2@v2.22.1
 	@echo "$(M2) Installing goimports..."
 	go install golang.org/x/tools/cmd/goimports@v0.3.0
 	@echo "$(M2) Installing golangci-lint..."

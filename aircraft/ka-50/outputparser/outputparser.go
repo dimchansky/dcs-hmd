@@ -8,6 +8,7 @@ import (
 )
 
 type ValuesSetter interface {
+	SetVerticalVelocity(val float64)
 	SetRotorPitch(val float64)
 	SetRotorRPM(val float64)
 }
@@ -21,8 +22,9 @@ type OutputParser struct {
 }
 
 const (
-	rotorRPMArg   = 52
-	rotorPitchArg = 53
+	verticalVelocity = 24
+	rotorRPMArg      = 52
+	rotorPitchArg    = 53
 )
 
 // HandleMessage implements udplistener.MessageHandler interface.
@@ -57,6 +59,9 @@ func (p *OutputParser) HandleMessage(msg []byte) {
 		valBs := pVal.Result
 
 		switch arg {
+		case verticalVelocity: // vertical velocity
+			handleVerticalVelocity(p.s, valBs)
+
 		case rotorRPMArg: // rotor RPM
 			handleRotorRPM(p.s, valBs)
 
@@ -64,6 +69,22 @@ func (p *OutputParser) HandleMessage(msg []byte) {
 			handleRotorPitch(p.s, valBs)
 		}
 	}
+}
+
+func handleVerticalVelocity(s ValuesSetter, valBs []byte) {
+	val, err := strconv.ParseFloat(*(*string)(unsafe.Pointer(&valBs)), 64)
+	if err != nil {
+		return
+	}
+
+	const (
+		minVal              = -1.0
+		maxVal              = 1.0
+		maxVerticalVelocity = 30.0
+		minVerticalVelocity = -30.0
+	)
+
+	s.SetVerticalVelocity((val-minVal)/(maxVal-minVal)*(maxVerticalVelocity-minVerticalVelocity) + minVerticalVelocity)
 }
 
 func handleRotorRPM(s ValuesSetter, valBs []byte) {

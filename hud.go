@@ -10,6 +10,7 @@ import (
 
 	"github.com/dimchansky/dcs-hmd/aircraft/ka-50/devices/rotorpitch"
 	"github.com/dimchansky/dcs-hmd/aircraft/ka-50/devices/rotorrpm"
+	"github.com/dimchansky/dcs-hmd/aircraft/ka-50/devices/verticalvelocity"
 	"github.com/dimchansky/dcs-hmd/utils"
 )
 
@@ -72,6 +73,19 @@ func NewHUD() (*HUD, error) {
 			Max: image.Pt(rowWidth*2+xSpan, indicatorHeight-ySpan),
 		},
 	})
+	verticalVelocityIndicator := verticalvelocity.NewIndicator(&verticalvelocity.IndicatorConfig{
+		Width:           rowWidth * 3,
+		Height:          indicatorHeight,
+		TickLength:      rowWidth,
+		MinorTickLength: rowWidth * 3 / 4,
+		LineWidth:       2,
+		Color:           textColor,
+		BorderColor:     shadowColor,
+		Rect: image.Rectangle{
+			Min: image.Pt(xSpan, ySpan),
+			Max: image.Pt(rowWidth*2+xSpan, indicatorHeight-ySpan),
+		},
+	})
 
 	ff, err := NewFontFace(fontBaseSize, dpi)
 	if err != nil {
@@ -79,9 +93,10 @@ func NewHUD() (*HUD, error) {
 	}
 
 	hud := &HUD{
-		fontFace:            ff,
-		rotorPitchIndicator: rotorPitchIndicator,
-		rotorRPMIndicator:   rotorRPMIndicator,
+		fontFace:                  ff,
+		rotorPitchIndicator:       rotorPitchIndicator,
+		rotorRPMIndicator:         rotorRPMIndicator,
+		verticalVelocityIndicator: verticalVelocityIndicator,
 	}
 
 	return hud, nil
@@ -90,12 +105,14 @@ func NewHUD() (*HUD, error) {
 type HUD struct {
 	once sync.Once
 
-	fontFace            *FontFace
-	rotorPitchIndicator *rotorpitch.Indicator
-	rotorRPMIndicator   *rotorrpm.Indicator
+	fontFace                  *FontFace
+	rotorPitchIndicator       *rotorpitch.Indicator
+	rotorRPMIndicator         *rotorrpm.Indicator
+	verticalVelocityIndicator *verticalvelocity.Indicator
 
-	rotorPitchImg redrawnImage
-	rotorRPMImg   redrawnImage
+	rotorPitchImg       redrawnImage
+	rotorRPMImg         redrawnImage
+	verticalVelocityImg redrawnImage
 }
 
 func (h *HUD) Close() error {
@@ -107,6 +124,7 @@ func (h *HUD) Update() error {
 
 	h.rotorPitchImg.Update(h.rotorPitchIndicator.GetImage())
 	h.rotorRPMImg.Update(h.rotorRPMIndicator.GetImage())
+	h.verticalVelocityImg.Update(h.verticalVelocityIndicator.GetImage())
 
 	return nil
 }
@@ -114,9 +132,11 @@ func (h *HUD) Update() error {
 func (h *HUD) Draw(screen *ebiten.Image) {
 	rotorPitchImg := &h.rotorPitchImg
 	rotorRPMImg := &h.rotorRPMImg
+	verticalVelocityImg := &h.verticalVelocityImg
 
 	if !rotorPitchImg.NeedToDraw &&
-		!rotorRPMImg.NeedToDraw {
+		!rotorRPMImg.NeedToDraw &&
+		!verticalVelocityImg.NeedToDraw {
 		return
 	}
 
@@ -126,6 +146,10 @@ func (h *HUD) Draw(screen *ebiten.Image) {
 
 	op.GeoM.Translate(float64(rotorPitchImg.Size().X), 0)
 	rotorRPMImg.DrawOn(screen, op)
+
+	op.GeoM.Reset()
+	op.GeoM.Translate(ScreenWidth-float64(verticalVelocityImg.Size().X)-1, rowHeight)
+	verticalVelocityImg.DrawOn(screen, op)
 }
 
 func (h *HUD) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeight int) {
@@ -140,6 +164,11 @@ func (h *HUD) SetRotorPitch(val float64) {
 // SetRotorRPM is thread-safe to update rotor RPM.
 func (h *HUD) SetRotorRPM(val float64) {
 	h.rotorRPMIndicator.SetRotorRPM(val)
+}
+
+// SetVerticalVelocity is thread-safe to update vertical velocity.
+func (h *HUD) SetVerticalVelocity(val float64) {
+	h.verticalVelocityIndicator.SetVerticalVelocity(val)
 }
 
 func enableCurrentProcessWindowClickThroughAsync() {

@@ -77,6 +77,9 @@ end
 
 DCSHMD.Ka50HighImportanceArguments =
 {
+    -- VVI
+    ---------------------------------------------------
+    [24]  = "%.4f", 		-- vy (Vertical Velocity Indicator) input={-30.0, 30.0} output={-1.0,1.0}
     -- Rotor Pitch
     ---------------------------------------------------
     [53]  = "%.4f", 		-- RotorPitch input={1.0, 15.0} output={0.0,1.0}

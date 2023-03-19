@@ -34,6 +34,7 @@ func run() (err error) {
 
 	rotorRPMWave := triangleWave(37.0)
 	rotorPitchWave := triangleWave(5.0)
+	verticalVelocity := triangleWave(11.0)
 	start := time.Now()
 	unixTs := start.Unix()
 
@@ -42,8 +43,9 @@ func run() (err error) {
 
 		rotorRPMVal := rotorRPMWave.Value(t)
 		rotorPitchVal := rotorPitchWave.Value(t)
+		verticalVelocityVal := verticalVelocity.Value(t)*2.0 - 1.0
 
-		toSend := fmt.Sprintf("%08x*52=%0.4f:53=%0.4f\n", unixTs, rotorRPMVal, rotorPitchVal)
+		toSend := fmt.Sprintf("%08x*52=%0.4f:53=%0.4f:24=%0.4f\n", unixTs, rotorRPMVal, rotorPitchVal, verticalVelocityVal)
 		_, _ = udpConn.Write([]byte(toSend))
 
 		time.Sleep(16 * time.Millisecond)
