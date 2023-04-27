@@ -1,12 +1,19 @@
 GO=go
 GOTEST=$(GO) test
 GOVET=$(GO) vet
+PACKAGE_NAME := $(shell $(GO) list -m)
 OUT_DIR := $(if $(OUT_DIR),$(OUT_DIR),./bin)
 MOCKS_DIR=./internal/mocks
 
 BENCH ?=.
 BENCH_FLAGS ?= -benchmem
 export GO111MODULE := on
+
+VERSION ?= vlatest
+COMMIT ?= $(shell git rev-parse HEAD)
+BUILD_TIME ?= $(shell TZ=UTC date -u '+%Y-%m-%dT%H:%M:%SZ')
+
+GO_LDFLAGS := '-X "$(PACKAGE_NAME)/cmd.Version=$(VERSION)" -X "$(PACKAGE_NAME)/cmd.BuildTime=$(BUILD_TIME)" -X "$(PACKAGE_NAME)/cmd.GitHash=$(COMMIT)"'
 
 GREEN  := $(shell tput -Txterm setaf 2)
 YELLOW := $(shell tput -Txterm setaf 3)
@@ -39,7 +46,7 @@ mocks: ## Generate mocks for Golang interfaces
 build: ## Build your project and put the output binary in out/bin/
 	@echo '$(M) building the artifacts…'
 	mkdir -p $(OUT_DIR)
-	$(GO) build -o $(OUT_DIR) ./cmd/...
+	$(GO) build --ldflags=$(GO_LDFLAGS) -o $(OUT_DIR) ./cmd/...
 
 clean: ## Remove build related file
 	@echo '$(M) removing the artifacts…'

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"log"
 
@@ -9,10 +10,21 @@ import (
 
 	dcshmd "github.com/dimchansky/dcs-hmd"
 	"github.com/dimchansky/dcs-hmd/aircraft/ka-50/outputparser"
+	"github.com/dimchansky/dcs-hmd/cmd"
 	"github.com/dimchansky/dcs-hmd/updlistener"
 )
 
 func main() {
+	var showVersion bool
+	flag.BoolVar(&showVersion, "v", false, "show version information")
+	flag.Parse()
+
+	if showVersion {
+		fmt.Printf("Version: %s\nBuild Time: %s\nGit Hash: %s\n",
+			cmd.Version, cmd.BuildTime, cmd.GitHash)
+		return
+	}
+
 	if err := run(); err != nil {
 		log.Fatal(err)
 	}
