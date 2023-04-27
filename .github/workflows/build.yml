@@ -48,7 +48,6 @@ jobs:
         run: |
           New-Item -Force -ItemType Directory "$env:TEMP\artifacts-windows"
           Copy-Item -Recurse -Force .\bin "$env:TEMP\artifacts-windows"
-          Copy-Item -Recurse -Force .\scripts "$env:TEMP\artifacts-windows"
           Copy-Item -Force .\README.md "$env:TEMP\artifacts-windows"
           Compress-Archive -Path "$env:TEMP\artifacts-windows\*" -CompressionLevel Optimal -DestinationPath .\artifacts-windows-amd64.zip
           Remove-Item "$env:TEMP\artifacts-windows" -Recurse -Force -ErrorAction Ignore

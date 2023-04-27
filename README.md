@@ -21,14 +21,14 @@ I plan to add the ability to show the current values of the following parameters
 
 1. Download the `dcs-hmd-vX.X.X.zip` file from the [latest release](https://github.com/dimchansky/dcs-hmd/releases/latest) and extract it.
 
-2. Copy the entire contents of the `scripts` directory to the following folder:  `%USERPROFILE%/Saved Games/DCS.openbeta/Scripts`.
+2. Open a command prompt or terminal window and navigate to the directory where you extracted the `dcs-hmd-vX.X.X.zip` file.
 
-3. Add the following line at the top of the `%USERPROFILE%/Saved Games/DCS.openbeta/Scripts/Export.lua` file:
+3. Run the `dcs-hmd.exe` program with the `-i` flag followed by the path to your DCS scripts directory (usually `%USERPROFILE%/Saved Games/DCS.openbeta/Scripts`). For example:
 
-       local lfs=require('lfs');dofile(lfs.writedir()..'Scripts/DCSHMD/Export.lua')`
+       dcs-hmd.exe -i "%USERPROFILE%/Saved Games/DCS.openbeta/Scripts"
 
-   You can find this line in the `scripts/Export.lua.snippet` file.
+   This will automatically install the required scripts in the specified DCS scripts directory.
 
-4. If you have multiple monitors, run `bin/dcs-hmd.exe` on the monitor where you want the helmet-mounted display (HMD) to appear.
+4. If you have multiple monitors, run `dcs-hmd.exe` on the monitor where you want the helmet-mounted display (HMD) to appear.
 
 5. Run DCS World in **borderless windowed mode**, and select the Ka-50 helicopter mission.

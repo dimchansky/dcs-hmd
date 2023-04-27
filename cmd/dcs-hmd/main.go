@@ -3,7 +3,6 @@ package main
 import (
 	"flag"
 	"fmt"
-	"log"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	_ "github.com/silbinarywolf/preferdiscretegpu"
@@ -16,7 +15,9 @@ import (
 
 func main() {
 	var showVersion bool
+	var targetDir string
 	flag.BoolVar(&showVersion, "v", false, "show version information")
+	flag.StringVar(&targetDir, "i", "", "target DCS scripts directory (usually %USERPROFILE%/Saved Games/DCS/ScriptsFS)")
 	flag.Parse()
 
 	if showVersion {
@@ -25,8 +26,24 @@ func main() {
 		return
 	}
 
+	if flag.Lookup("i") != nil {
+		// check if -i flag is provided without a target directory name
+		if targetDir == "" {
+			fmt.Println("error: target DCS scripts directory is not specified")
+			return
+		}
+
+		if err := dcshmd.InstallScripts(targetDir, true); err != nil {
+			fmt.Println("error:", err)
+			return
+		}
+		fmt.Printf("all scripts are successfully installed to folder: %s", targetDir)
+		fmt.Println()
+		return
+	}
+
 	if err := run(); err != nil {
-		log.Fatal(err)
+		fmt.Println("error:", err)
 	}
 }
 
