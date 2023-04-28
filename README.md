@@ -54,3 +54,13 @@ If you encounter any problems while using DCS-HMD, please follow these steps to 
 3. Provide a detailed description of the problem, including any error messages or logs.
 
 By providing this information, it will help me understand which version of the software is installed and which version of the code may be causing the problem.
+
+## Frequently Asked Questions
+
+### Does dcs-hmd pass Integrity Check (IC) in multiplayer?
+
+Yes, it passes the Integrity Check (IC) in multiplayer because it uses the standard Export function, similar to TacView or Helios. However, if the server owner disables export in the server settings, then it may not work anymore. But in most cases, server owners do not disable export.
+
+### Does dcs-hmd work in VR?
+
+Currently, it doesn't work in VR, but I'm actively exploring ways to make it work. It's definitely something I'm considering for a future update, so stay tuned!
