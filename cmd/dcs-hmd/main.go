@@ -14,32 +14,36 @@ import (
 )
 
 func main() {
-	var showVersion bool
-	var targetDir string
-	flag.BoolVar(&showVersion, "v", false, "show version information")
-	flag.StringVar(&targetDir, "i", "", "target DCS scripts directory (usually %USERPROFILE%/Saved Games/DCS/ScriptsFS)")
+	showVersion := flag.Bool("v", false, "show version information")
+	installDir := flag.String("i", "", "install scripts to the target DCS scripts directory (usually %USERPROFILE%/Saved Games/DCS/ScriptsFS)")
+	unInstallDir := flag.String("u", "", "uninstall scripts from the target DCS scripts directory (usually %USERPROFILE%/Saved Games/DCS/ScriptsFS)")
 	flag.Parse()
 
-	if showVersion {
+	if *showVersion {
 		fmt.Printf("Version: %s\nBuild Time: %s\nGit Hash: %s\n",
 			cmd.Version, cmd.BuildTime, cmd.GitHash)
 		return
 	}
 
-	if flag.Lookup("i") != nil {
-		// check if -i flag is provided without a target directory name
-		if targetDir == "" {
-			fmt.Println("error: target DCS scripts directory is not specified")
-			return
-		}
-
-		if err := dcshmd.InstallScripts(targetDir, true); err != nil {
+	if *installDir != "" {
+		if err := dcshmd.InstallScripts(*installDir, true); err != nil {
 			fmt.Println("error:", err)
 			return
 		}
-		fmt.Printf("all scripts are successfully installed to folder: %s", targetDir)
+		fmt.Printf("all scripts are successfully installed to the folder: %s", *installDir)
 		fmt.Println()
 		return
+	}
+
+	if *unInstallDir != "" {
+		if err := dcshmd.UninstallScripts(*unInstallDir, true); err != nil {
+			fmt.Println("error:", err)
+			return
+		}
+		fmt.Printf("all scripts were successfully uninstalled from the folder: %s", *unInstallDir)
+		fmt.Println()
+		return
+
 	}
 
 	if err := run(); err != nil {

@@ -32,3 +32,25 @@ I plan to add the ability to show the current values of the following parameters
 4. If you have multiple monitors, run `dcs-hmd.exe` on the monitor where you want the helmet-mounted display (HMD) to appear.
 
 5. Run DCS World in **borderless windowed mode**, and select the Ka-50 helicopter mission.
+
+## Uninstall
+
+To uninstall all scripts that were installed with the `-i` flag, you can use the `-u` flag followed by the path to your DCS scripts directory (usually `%USERPROFILE%/Saved Games/DCS.openbeta/Scripts`). For example:
+
+    dcs-hmd.exe -u "%USERPROFILE%/Saved Games/DCS.openbeta/Scripts"
+
+This will delete all installed scripts and update the `Export.lua` file.
+
+## Troubleshooting
+
+If you encounter any problems while using DCS-HMD, please follow these steps to help me solve the issue more quickly:
+
+1. Run `dcs-hmd.exe` with the `-v` flag to print version information. This will display information such as the version number, build time, and Git hash.
+
+       dcs-hmd.exe -v
+
+2. Copy the version information and include it when [reporting the issue](https://github.com/dimchansky/dcs-hmd/issues) on GitHub.
+
+3. Provide a detailed description of the problem, including any error messages or logs.
+
+By providing this information, it will help me understand which version of the software is installed and which version of the code may be causing the problem.
