@@ -16,7 +16,7 @@ jobs:
     steps:
       - name: Set current date and time in UTC
         run: |
-          echo "CURRENT_TIME=$(Get-Date -Format "o")" | Out-File -FilePath $env:GITHUB_ENV -Append
+          echo "BUILD_START_TIME=$(Get-Date -Format "o")" | Out-File -FilePath $env:GITHUB_ENV -Append
         shell: pwsh
 
       - name: Checkout code
@@ -40,23 +40,22 @@ jobs:
         env:
           VERSION: ${{ github.ref_name }}
           COMMIT: ${{ github.sha }}
-          BUILD_TIME: ${{ env.CURRENT_TIME }}
+          BUILD_TIME: ${{ env.BUILD_START_TIME }}
         run: |
           make build
 
-      - name: Compress artifact
-        run: |
-          New-Item -Force -ItemType Directory "$env:TEMP\artifacts-windows"
-          Copy-Item -Recurse -Force .\bin "$env:TEMP\artifacts-windows"
-          Copy-Item -Force .\README.md "$env:TEMP\artifacts-windows"
-          Compress-Archive -Path "$env:TEMP\artifacts-windows\*" -CompressionLevel Optimal -DestinationPath .\artifacts-windows-amd64.zip
-          Remove-Item "$env:TEMP\artifacts-windows" -Recurse -Force -ErrorAction Ignore
+      - name: Rename README.md to README.txt
+        run: move README.md README.txt
+        shell: cmd
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
+            path: |
+              ./bin/*
+              ./README.txt
             name: artifacts-windows
-            path: artifacts-windows-amd64.zip
+            if-no-files-found: error
             retention-days: 7
 
   release:
@@ -67,10 +66,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Download windows artifact
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: artifacts-windows
           path: artifacts
+
+      - name: Zip downloaded artifact
+        run: |
+          cd artifacts
+          zip -r ../dcs-hmd-windows-amd64.zip .
 
       - name: Build changelog
         id: build_changelog
@@ -116,6 +120,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: artifacts/artifacts-windows-amd64.zip
+          asset_path: dcs-hmd-windows-amd64.zip
           asset_name: dcs-hmd-${{ github.ref_name }}.zip
           asset_content_type: application/zip
