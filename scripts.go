@@ -23,6 +23,11 @@ const (
 // InstallScripts installs the scripts in the specified target directory.
 // If verbose is true, the function prints detailed log messages to stdout.
 func InstallScripts(scriptsInstallDir string, verbose bool) error {
+	// check if scriptsInstallDir exists
+	if _, err := os.Stat(scriptsInstallDir); os.IsNotExist(err) {
+		return fmt.Errorf("folder does not exist: '%s'", scriptsInstallDir)
+	}
+
 	// replace the scripts in the target directory
 	if err := replaceScripts(scriptsInstallDir, verbose); err != nil {
 		return err
