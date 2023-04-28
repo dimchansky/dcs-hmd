@@ -23,9 +23,9 @@ I plan to add the ability to show the current values of the following parameters
 
 2. Open a command prompt or terminal window and navigate to the directory where you extracted the `dcs-hmd-vX.X.X.zip` file.
 
-3. Run the `dcs-hmd.exe` program with the `-i` flag followed by the path to your DCS scripts directory (usually `%USERPROFILE%/Saved Games/DCS.openbeta/Scripts`). For example:
+3. Run the `dcs-hmd.exe` program with the `-i` flag followed by the path to your DCS scripts directory (usually `%USERPROFILE%\Saved Games\DCS.openbeta\Scripts`). For example:
 
-       dcs-hmd.exe -i "%USERPROFILE%/Saved Games/DCS.openbeta/Scripts"
+       dcs-hmd.exe -i "%USERPROFILE%\Saved Games\DCS.openbeta\Scripts"
 
    This will automatically install the required scripts in the specified DCS scripts directory.
 
@@ -35,9 +35,9 @@ I plan to add the ability to show the current values of the following parameters
 
 ## Uninstall
 
-To uninstall all scripts that were installed with the `-i` flag, you can use the `-u` flag followed by the path to your DCS scripts directory (usually `%USERPROFILE%/Saved Games/DCS.openbeta/Scripts`). For example:
+To uninstall all scripts that were installed with the `-i` flag, you can use the `-u` flag followed by the path to your DCS scripts directory (usually `%USERPROFILE%\Saved Games\DCS.openbeta\Scripts`). For example:
 
-    dcs-hmd.exe -u "%USERPROFILE%/Saved Games/DCS.openbeta/Scripts"
+    dcs-hmd.exe -u "%USERPROFILE%\Saved Games\DCS.openbeta\Scripts"
 
 This will delete all installed scripts and update the `Export.lua` file.
 

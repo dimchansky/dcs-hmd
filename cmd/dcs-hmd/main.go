@@ -15,8 +15,8 @@ import (
 
 func main() {
 	showVersion := flag.Bool("v", false, "show version information")
-	installDir := flag.String("i", "", "install scripts to the target DCS scripts directory (usually %USERPROFILE%/Saved Games/DCS/ScriptsFS)")
-	unInstallDir := flag.String("u", "", "uninstall scripts from the target DCS scripts directory (usually %USERPROFILE%/Saved Games/DCS/ScriptsFS)")
+	installDir := flag.String("i", "", `install scripts to the target DCS scripts directory (usually "%USERPROFILE%\Saved Games\DCS.openbeta\Scripts")`)
+	unInstallDir := flag.String("u", "", `uninstall scripts from the target DCS scripts directory (usually "%USERPROFILE%\Saved Games\DCS.openbeta\Scripts")`)
 	flag.Parse()
 
 	if *showVersion {
