@@ -44,16 +44,14 @@ jobs:
         run: |
           make build
 
-      - name: Rename README.md to README.txt
-        run: move README.md README.txt
+      - name: Copy README.md to bin\README.txt
+        run: copy README.md bin\README.txt
         shell: cmd
 
       - name: Upload artifact
         uses: actions/upload-artifact@v3
         with:
-            path: |
-              ./bin/*
-              ./README.txt
+            path: ./bin/*
             name: artifacts-windows
             if-no-files-found: error
             retention-days: 7
